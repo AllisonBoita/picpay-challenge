@@ -2,7 +2,7 @@ package com.picpaysimplificado.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.usertype.UserType;
+import com.picpaysimplificado.domain.user.UserType;
 
 import java.math.BigDecimal;
 
@@ -25,5 +25,5 @@ public class User {
     private String password;
     private BigDecimal balance;
     @Enumerated(EnumType.STRING)
-    private UserType<String> userType;
+    private UserType userType;
 }

@@ -32,6 +32,7 @@ public class UserService {
 
     public void saveUser(User user){
         this.repository.save(user);
+        System.out.println("Document salvo: " + user.getDocument());
     }
 
     public User createUser(UserDTO data){

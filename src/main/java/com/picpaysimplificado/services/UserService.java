@@ -3,6 +3,9 @@ package com.picpaysimplificado.services;
 import com.picpaysimplificado.domain.user.User;
 import com.picpaysimplificado.domain.user.UserType;
 import com.picpaysimplificado.dtos.UserDTO;
+import com.picpaysimplificado.infra.InsufficientBalanceException;
+import com.picpaysimplificado.infra.NonAuthorizedUserType;
+import com.picpaysimplificado.infra.NotFoundUser;
 import com.picpaysimplificado.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +19,18 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public void validateTransaction(User sender, BigDecimal amount) throws Exception {
+    public void validateTransaction(User sender, BigDecimal amount){
         if(sender.getUserType() == UserType.MERCHANT){
-            throw new Exception("Usuário do tipo Lojista não está autorizado a realizar transação");
+            throw new NonAuthorizedUserType();
         }
 
         if(sender.getBalance().compareTo(amount) < 0){
-            throw new Exception("Saldo Insuficiente");
+            throw new InsufficientBalanceException();
         }
     }
 
-    public User findUserById(Long id) throws Exception {
-        return this.repository.findUserById(id).orElseThrow(() -> new Exception("Usuário não encontrado."));
+    public User findUserById(Long id){
+        return this.repository.findUserById(id).orElseThrow(() -> new NotFoundUser());
     }
 
     public void saveUser(User user){

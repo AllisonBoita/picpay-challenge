@@ -30,8 +30,10 @@ public class User {
     private UserType userType;
 
     public User(UserDTO data){
+        System.out.println("document recebido: " + data.document()); // 👈 teste aqui
         this.firstName = data.firstName();
         this.lastName = data.lastName();
+        this.document = data.document();
         this.balance = data.balance();
         this.userType = data.userType();
         this.password = data.password();

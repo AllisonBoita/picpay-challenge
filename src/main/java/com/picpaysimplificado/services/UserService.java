@@ -6,6 +6,7 @@ import com.picpaysimplificado.dtos.UserDTO;
 import com.picpaysimplificado.infra.InsufficientBalanceException;
 import com.picpaysimplificado.infra.NonAuthorizedUserType;
 import com.picpaysimplificado.infra.NotFoundUser;
+import com.picpaysimplificado.infra.UserAlreadyExistsException;
 import com.picpaysimplificado.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,11 @@ public class UserService {
     }
 
     public User createUser(UserDTO data){
+
+        if (repository.existsByDocument(data.document()) || repository.existsByEmail(data.email())) {
+            throw new UserAlreadyExistsException();
+        }
+
         User newUser = new User(data);
         this.saveUser(newUser);
         return newUser;

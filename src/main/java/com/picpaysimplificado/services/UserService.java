@@ -3,16 +3,14 @@ package com.picpaysimplificado.services;
 import com.picpaysimplificado.domain.user.User;
 import com.picpaysimplificado.domain.user.UserType;
 import com.picpaysimplificado.dtos.UserDTO;
-import com.picpaysimplificado.infra.InsufficientBalanceException;
-import com.picpaysimplificado.infra.NonAuthorizedUserType;
-import com.picpaysimplificado.infra.NotFoundUser;
-import com.picpaysimplificado.infra.UserAlreadyExistsException;
+import com.picpaysimplificado.infra.*;
 import com.picpaysimplificado.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -22,7 +20,7 @@ public class UserService {
 
     public void validateTransaction(User sender, BigDecimal amount){
         if(sender.getUserType() == UserType.MERCHANT){
-            throw new NonAuthorizedUserType();
+            throw new ForbiddenUserTypeException();
         }
 
         if(sender.getBalance().compareTo(amount) < 0){
@@ -37,6 +35,7 @@ public class UserService {
     public void saveUser(User user){
         this.repository.save(user);
         System.out.println("Document salvo: " + user.getDocument());
+
     }
 
     public User createUser(UserDTO data){
@@ -45,9 +44,17 @@ public class UserService {
             throw new UserAlreadyExistsException();
         }
 
+        validateUserType(data.userType());
+
         User newUser = new User(data);
         this.saveUser(newUser);
         return newUser;
+    }
+
+    public static void validateUserType(UserType userType) {
+        if (userType != UserType.MERCHANT && userType != UserType.COMMON) {
+            throw new UnexpectedUserType();
+        }
     }
 
     public List<User> getAllUsers() {
